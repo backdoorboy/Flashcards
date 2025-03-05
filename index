@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard Scanner</title>
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-top: 50px;
+            color: #fff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        h1:hover {
+            color: #ff6f61;
+            transform: scale(1.1);
+        }
+
+        .flashcard {
+            display: inline-block;
+            width: 80vw;
+            max-width: 400px;
+            height: 250px;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .flashcard:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        #uploadSection {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 30px auto;
+            max-width: 300px; /* Reduced width for mobile-friendly view */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: left; /* Align text to the left for a cleaner look */
+        }
+
+        label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #000; /* Black text color for better visibility */
+        }
+
+        input[type="file"] {
+            font-size: 1em;
+            margin: 10px 0 20px;
+            width: 100%; /* Make the file input take up the full width */
+        }
+
+        button {
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            width: 100%; /* Button takes full width of the container */
+        }
+
+        button:hover {
+            background-color: #ff7e5f;
+            transform: scale(1.1);
+        }
+
+        #uploadedInfo {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+
+        #flashcards {
+            display: none;
+            margin-top: 30px;
+        }
+
+        p {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        #cardCount {
+            color: #fff;
+            font-size: 1.5em;
+        }
+
+        /* The Modal (background) */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #fff;
+            color: #000;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .modal-body {
+            margin-top: 10px;
+        }
+
+        .modal-footer {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Button for Tutorial */
+        #tutorialBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ff6f61;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #tutorialBtn:hover {
+            background-color: #ff7e5f;
+        }
+
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Flashcard Scanner</h1>
+    
+    <!-- Tutorial Button -->
+    <button id="tutorialBtn">How to Use</button>
+    
+    <!-- The Modal -->
+    <div id="tutorialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                How to Use
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>1. Upload the front (question side) and back (answer side) of your flashcards.</p>
+                <p>2. Click "Add Another Flashcard" if you want to upload more.</p>
+                <p>3. When you're done, click "Start Revision" to begin reviewing your flashcards.</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="uploadSection">
+        <label for="frontImage">Upload the front (question side) of the flashcard:</label>
+        <input type="file" accept="image/*" id="frontImage" onchange="addCard('front')"><br><br>
+        <label for="backImage">Upload the back (answer side) of the flashcard:</label>
+        <input type="file" accept="image/*" id="backImage" onchange="addCard('back')">
+    </div>
+    <button id="addAnother" style="display: none;" onclick="resetUpload()">Add Another Flashcard</button>
+    
+    <div id="uploadedInfo">
+        <p>Flashcards uploaded: <span id="cardCount">0</span></p>
+        <button id="startBtn" style="display: none;" onclick="startRevision()">Start Revision</button>
+    </div>
+    
+    <div id="flashcards" style="display: none;"></div>
+    
+    <script>
+        let flashcards = [];
+
+        function addCard(side) {
+            const input = document.getElementById(side + 'Image');
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (side === 'front') {
+                    flashcards.push({ front: e.target.result, back: null });
+                } else {
+                    if (flashcards.length > 0 && !flashcards[flashcards.length - 1].back) {
+                        flashcards[flashcards.length - 1].back = e.target.result;
+                        document.getElementById('uploadSection').style.display = 'none';
+                        document.getElementById('addAnother').style.display = 'block';
+                        document.getElementById('startBtn').style.display = 'block';
+                    }
+                }
+                updateUploadedInfo();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateUploadedInfo() {
+            const cardCountElement = document.getElementById('cardCount');
+            cardCountElement.textContent = flashcards.length;
+        }
+
+        function resetUpload() {
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('addAnother').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('frontImage').value = '';
+            document.getElementById('backImage').value = '';
+        }
+
+        function startRevision() {
+            document.getElementById('flashcards').style.display = 'block';
+            document.getElementById('uploadedInfo').style.display = 'none';
+            renderFlashcards();
+        }
+
+        function renderFlashcards() {
+            const container = document.getElementById('flashcards');
+            container.innerHTML = '';
+            flashcards.forEach((card, index) => {
+                if (card.front && card.back) {
+                    const div = document.createElement('div');
+                    div.classList.add('flashcard');
+                    div.style.backgroundImage = `url('${card.front}')`;
+                    div.onclick = function() {
+                        div.style.backgroundImage = div.style.backgroundImage.includes(card.front) ? `url('${card.back}')` : `url('${card.front}')`;
+                    };
+                    container.appendChild(div);
+                }
+            });
+        }
+
+        // Modal functions
+        const modal = document.getElementById("tutorialModal");
+        const btn = document.getElementById("tutorialBtn");
+        const span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+    </script>
+</body>
+</html>
