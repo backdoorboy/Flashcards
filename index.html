@@ -84,6 +84,32 @@
             transform: scale(1.1);
         }
 
+        /* Admin Panel Button */
+        #adminPanelBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 70px; /* Moves it to the left of the tutorial button */
+            background-color: #ff6f61;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            width: 120px;
+            height: 40px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+        }
+
+        #adminPanelBtn:hover {
+            background-color: #ff7e5f;
+            transform: scale(1.1);
+        }
+
         /* Tutorial Popup */
         #tutorialPopup {
             display: none;
@@ -120,6 +146,61 @@
             z-index: 999;
         }
 
+        /* Admin Panel Section */
+        #adminPanel {
+            display: none;
+            position: fixed;
+            top: 20%;
+            left: 20%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 60%;
+            max-width: 400px;
+            z-index: 1001;
+        }
+
+        #adminPanel input {
+            margin-bottom: 10px;
+            padding: 8px;
+            font-size: 16px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        #adminPanel button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        #adminPanel button:hover {
+            background-color: #45a049;
+        }
+
+        /* Close Button */
+        #closeAdminPanelBtn {
+            background-color: #f44336;
+            color: white;
+            font-size: 16px;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        #closeAdminPanelBtn:hover {
+            background-color: #e53935;
+        }
+
         /* Version Display */
         #version {
             position: fixed;
@@ -148,6 +229,9 @@
     <!-- Small "?" Button -->
     <button id="tutorialBtn" onclick="showTutorial()">?</button>
 
+    <!-- Admin Panel Button -->
+    <button id="adminPanelBtn" onclick="showAdminPanel()">Admin Panel</button>
+
     <!-- Tutorial Popup -->
     <div id="overlay" onclick="hideTutorial()"></div>
     <div id="tutorialPopup">
@@ -158,8 +242,17 @@
         <button onclick="hideTutorial()">Got it!</button>
     </div>
 
+    <!-- Admin Panel Popup -->
+    <div id="adminPanel">
+        <h2>Enter Admin Password</h2>
+        <input type="password" id="adminPassword" placeholder="Enter password">
+        <button onclick="checkAdminPassword()">Submit</button>
+        <div id="adminMessage"></div>
+        <button id="closeAdminPanelBtn" onclick="closeAdminPanel()">Close</button>
+    </div>
+
     <!-- Version Number -->
-    <div id="version">Version 1.0</div>
+    <div id="version">Version 1.1</div>
 
     <script>
         let flashcards = [];
@@ -191,14 +284,48 @@
             document.getElementById('backImage').value = '';
         }
 
+        function renderFlashcards() {
+            const container = document.getElementById('flashcards');
+            container.innerHTML = '';
+            flashcards.forEach((card) => {
+                if (card.front && card.back) {
+                    const div = document.createElement('div');
+                    div.classList.add('flashcard');
+                    div.style.backgroundImage = `url('${card.front}')`;
+                    div.onclick = function() {
+                        div.style.backgroundImage = div.style.backgroundImage.includes(card.front) ? `url('${card.back}')` : `url('${card.front}')`;
+                    };
+                    container.appendChild(div);
+                }
+            });
+        }
+
         function showTutorial() {
-            document.getElementById('overlay').style.display = 'block';
             document.getElementById('tutorialPopup').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
         }
 
         function hideTutorial() {
-            document.getElementById('overlay').style.display = 'none';
             document.getElementById('tutorialPopup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function showAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'block';
+        }
+
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === 'admin') {
+                document.getElementById('adminMessage').innerHTML = 'Access granted! You can now edit HTML.';
+                // Add your HTML editor here
+            } else {
+                document.getElementById('adminMessage').innerHTML = 'Incorrect password. Try again.';
+            }
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'none';
         }
     </script>
 </body>
